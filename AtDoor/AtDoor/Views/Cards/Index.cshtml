@@ -1,0 +1,157 @@
+﻿@model IEnumerable<AtDoor.Efs.Entities.Card>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<div class="row align-items-start">
+    <div class="col-md-1 align-items-start">
+        Mã
+    </div>
+    <div class="col-md-2 align-items-start">
+        Tên
+    </div>
+    <div class="col-md-1 align-items-start">
+        Chi tiết
+    </div>
+    <div class="col-md-1 align-items-start">
+        người tạo
+    </div>
+    <div class="col-md-1 align-items-start">
+        Ngày tạo
+    </div>
+    <div class="col-md-1 align-items-start">
+        Người sửa
+    </div>
+    <div class="col-md-1 align-items-start">
+        Ngày sửa
+    </div>
+    <div class="col-md-1 align-items-start">
+        @Html.DisplayNameFor(model => model.RowStatus)
+    </div>
+    <div class="col-md-1 align-items-start">
+        @Html.DisplayNameFor(model => model.Status)
+    </div>
+    <div class="col-md-2 align-items-start">
+        Mã người dùng 
+    </div>
+</div>
+@foreach (var item in Model)
+{
+    <div class="row">
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.Code)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.Name)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.Description)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.CreatedBy)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.ModifiedBy)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.ModifiedDate)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.RowStatus)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.Status)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayNameFor(model => model.FkUserId)
+        </div>
+    </div>
+}
+@*<table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Code)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CreatedBy)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CreatedDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ModifiedBy)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ModifiedDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.RowStatus)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FkUserId)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Code)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedBy)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ModifiedBy)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ModifiedDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RowStatus)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FkUserId)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>*@
