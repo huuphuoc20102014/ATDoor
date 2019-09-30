@@ -1,28 +1,24 @@
-﻿@model AT_Door.Controllers.CardEditViewModel
+﻿@model AT_Door.Controllers.DoorCreateViewModel
+
 
 @{
-    ViewData["Title"] = "Chỉnh Sửa Thẻ";
+    ViewData["Title"] = "Create";
 }
 
-<h1>Chỉnh Sửa Thẻ</h1>
 
-<h4>Thẻ</h4>
+<h4>Create Category</h4>
 <hr />
-<form asp-action="Edit">
+<form asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="row form-group">
         <div class="col-md-3 text-md-right ">
         </div>
         <div class="col-md-7">
-            <input type="submit" value="Save" class="btn btn-primary" />
-            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-success">Refresh</a>
-            <a asp-action="Details" asp-route-id="@Model.Id" class="k-button">Details</a>
+            <input type="submit" value="Create" class="btn btn-primary" />
             <a asp-action="Index" class="k-button">Back to List</a>
         </div>
     </div>
-    <input type="hidden" name="Id" value="@Model?.Id" />
-    <input type="hidden" asp-for="RowStatus" />
+
     <div class="row form-group">
         <div class="col-md-3 text-md-right ">
             <label asp-for="Code" class="col-form-label"></label>
@@ -35,6 +31,7 @@
             <span asp-validation-for="Code" class="text-danger"></span>
         </div>
     </div>
+
     <div class="row form-group">
         <div class="col-md-3 text-md-right ">
             <label asp-for="Name" class="col-form-label"></label>
@@ -49,41 +46,26 @@
     </div>
     <div class="row form-group">
         <div class="col-md-3 text-md-right ">
-            <label asp-for="FkUserId" class="col-form-label"></label>
-            <span class="text-danger">*</span>
-        </div>
-        <div class="col-md-7">
-            <input asp-for="FkUserId" class="k-textbox form-control" />
-        </div>
-        <div class="offset-md-3 col-md-7 at-wrapper-validate">
-            <span asp-validation-for="FkUserId" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="row form-group">
-        <div class="col-md-3 text-md-right ">
             <label asp-for="Description" class="col-form-label"></label>
             <span class="text-danger">*</span>
         </div>
         <div class="col-md-7">
-            <textarea asp-for="Description" class="k-textbox form-control"></textarea>
+            <input asp-for="Description" class="k-textbox form-control" />
         </div>
         <div class="offset-md-3 col-md-7 at-wrapper-validate">
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
     </div>
+
     <div class="row form-group">
         <div class="col-md-3 text-md-right ">
         </div>
         <div class="col-md-7">
-            <input type="submit" value="Save" class="btn btn-primary" />
-            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-success">Refresh</a>
-            <a asp-action="Details" asp-route-id="@Model.Id" class="k-button">Details</a>
+            <input type="submit" value="Create" class="btn btn-primary" />
             <a asp-action="Index" class="k-button">Back to List</a>
         </div>
     </div>
 </form>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+
+

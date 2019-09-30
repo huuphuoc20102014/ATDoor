@@ -1,12 +1,12 @@
-﻿@model AT_Door.Controllers.CardEditViewModel
+﻿@model AT_Door.Controllers.DoorEditViewModel
+
 
 @{
-    ViewData["Title"] = "Chỉnh Sửa Thẻ";
+    ViewData["Title"] = "Chỉnh Sửa Cửa";
 }
 
-<h1>Chỉnh Sửa Thẻ</h1>
-
-<h4>Thẻ</h4>
+<h1>Chỉnh Sửa Cửa</h1>
+<h4>Cửa</h4>
 <hr />
 <form asp-action="Edit">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -49,18 +49,6 @@
     </div>
     <div class="row form-group">
         <div class="col-md-3 text-md-right ">
-            <label asp-for="FkUserId" class="col-form-label"></label>
-            <span class="text-danger">*</span>
-        </div>
-        <div class="col-md-7">
-            <input asp-for="FkUserId" class="k-textbox form-control" />
-        </div>
-        <div class="offset-md-3 col-md-7 at-wrapper-validate">
-            <span asp-validation-for="FkUserId" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="row form-group">
-        <div class="col-md-3 text-md-right ">
             <label asp-for="Description" class="col-form-label"></label>
             <span class="text-danger">*</span>
         </div>
@@ -84,6 +72,15 @@
     </div>
 </form>
 
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            var dropdowntree = $("#FkProductId").data("kendoDropDownTree");
+            console.log($("#FkProductId").val());
+            dropdowntree.value($("#FkProductId").val());
+        })
+    </script>
 }
