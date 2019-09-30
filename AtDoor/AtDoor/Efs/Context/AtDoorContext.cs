@@ -21,7 +21,7 @@ namespace AtDoor.Efs.Context
         public virtual DbSet<Door> Door { get; set; }
         public virtual DbSet<HistoryCard> HistoryCard { get; set; }
         public virtual DbSet<HistoryDoor> HistoryDoor { get; set; }
-        public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<Users> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -69,11 +69,21 @@ namespace AtDoor.Efs.Context
                 entity.Property(e => e.RowStatus)
                     .IsRequired()
                     .IsRowVersion();
+
+                entity.HasOne(d => d.FkUser)
+                    .WithMany(p => p.Card)
+                    .HasForeignKey(d => d.FkUserId)
+                    .HasConstraintName("FK_CardUsers");
             });
 
             modelBuilder.Entity<CardDoor>(entity =>
             {
                 entity.Property(e => e.Id)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Code)
+                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -87,12 +97,10 @@ namespace AtDoor.Efs.Context
                 entity.Property(e => e.Description).HasMaxLength(1000);
 
                 entity.Property(e => e.FkCardId)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.FkDoorId)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -102,21 +110,11 @@ namespace AtDoor.Efs.Context
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.Name).HasMaxLength(100);
+
                 entity.Property(e => e.RowStatus)
                     .IsRequired()
                     .IsRowVersion();
-
-                entity.HasOne(d => d.FkCard)
-                    .WithMany(p => p.CardDoor)
-                    .HasForeignKey(d => d.FkCardId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_CardDoor");
-
-                entity.HasOne(d => d.FkDoor)
-                    .WithMany(p => p.CardDoor)
-                    .HasForeignKey(d => d.FkDoorId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_DoorDoor");
             });
 
             modelBuilder.Entity<Door>(entity =>
@@ -184,6 +182,16 @@ namespace AtDoor.Efs.Context
                 entity.Property(e => e.RowStatus)
                     .IsRequired()
                     .IsRowVersion();
+
+                entity.HasOne(d => d.FkCard)
+                    .WithMany(p => p.HistoryCard)
+                    .HasForeignKey(d => d.FkCardId)
+                    .HasConstraintName("FK_HistoryCard_Card");
+
+                entity.HasOne(d => d.FkUser)
+                    .WithMany(p => p.HistoryCard)
+                    .HasForeignKey(d => d.FkUserId)
+                    .HasConstraintName("FK_HistoryCard_Users");
             });
 
             modelBuilder.Entity<HistoryDoor>(entity =>
@@ -201,11 +209,11 @@ namespace AtDoor.Efs.Context
 
                 entity.Property(e => e.Description).HasMaxLength(1000);
 
-                entity.Property(e => e.FkDoorId)
+                entity.Property(e => e.FkCardId)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.FkUserId)
+                entity.Property(e => e.FkDoorId)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -218,9 +226,19 @@ namespace AtDoor.Efs.Context
                 entity.Property(e => e.RowStatus)
                     .IsRequired()
                     .IsRowVersion();
+
+                entity.HasOne(d => d.FkCard)
+                    .WithMany(p => p.HistoryDoor)
+                    .HasForeignKey(d => d.FkCardId)
+                    .HasConstraintName("FK_HistoryDoor_Card");
+
+                entity.HasOne(d => d.FkDoor)
+                    .WithMany(p => p.HistoryDoor)
+                    .HasForeignKey(d => d.FkDoorId)
+                    .HasConstraintName("FK_HistoryDoor_Door");
             });
 
-            modelBuilder.Entity<User>(entity =>
+            modelBuilder.Entity<Users>(entity =>
             {
                 entity.Property(e => e.Id)
                     .HasMaxLength(50)
@@ -250,11 +268,18 @@ namespace AtDoor.Efs.Context
                 entity.Property(e => e.RowStatus)
                     .IsRequired()
                     .IsRowVersion();
+
+                entity.HasOne(d => d.FkCard)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.FkCardId)
+                    .HasConstraintName("FK_UsersCard");
             });
 
             OnModelCreatingPartial(modelBuilder);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        public DbSet<AtDoor.Efs.Entities.Users> User { get; set; }
     }
 }

@@ -7,7 +7,9 @@ namespace AtDoor.Efs.Entities
     {
         public Card()
         {
-            CardDoor = new HashSet<CardDoor>();
+            HistoryCard = new HashSet<HistoryCard>();
+            HistoryDoor = new HashSet<HistoryDoor>();
+            Users = new HashSet<Users>();
         }
 
         public string Id { get; set; }
@@ -22,6 +24,9 @@ namespace AtDoor.Efs.Entities
         public int Status { get; set; }
         public string FkUserId { get; set; }
 
-        public virtual ICollection<CardDoor> CardDoor { get; set; }
+        public virtual Users FkUser { get; set; }
+        public virtual ICollection<HistoryCard> HistoryCard { get; set; }
+        public virtual ICollection<HistoryDoor> HistoryDoor { get; set; }
+        public virtual ICollection<Users> Users { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace AtDoor.Efs.Entities
     {
         public Door()
         {
-            CardDoor = new HashSet<CardDoor>();
+            HistoryDoor = new HashSet<HistoryDoor>();
         }
 
         public string Id { get; set; }
@@ -21,6 +21,6 @@ namespace AtDoor.Efs.Entities
         public byte[] RowStatus { get; set; }
         public int Status { get; set; }
 
-        public virtual ICollection<CardDoor> CardDoor { get; set; }
+        public virtual ICollection<HistoryDoor> HistoryDoor { get; set; }
     }
 }
