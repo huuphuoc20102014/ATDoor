@@ -22,7 +22,7 @@ namespace AtDoor.Controllers
         // GET: Doors
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Door.ToListAsync());
+            return View(await _context.Door.Where(p=>p.Status == (int)AtRowStatus.Normal).ToListAsync());
         }
 
         // GET: Doors/Details/5
@@ -54,15 +54,44 @@ namespace AtDoor.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Code,Name,Description,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowStatus,Status")] Door door)
+        public async Task<IActionResult> Create(DoorCreateViewModel vmItem)
         {
-            if (ModelState.IsValid)
+            // Invalid model
+            if (!ModelState.IsValid)
             {
-                _context.Add(door);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(vmItem);
             }
-            return View(door);
+            // Get time stamp for table to handle concurrency conflict
+            var tableName = nameof(Door);
+            var tableVersion = await _context.HistoryDoor.FirstOrDefaultAsync(h => h.Id == tableName);
+            // Check code is existed
+            if (await _context.Door.AnyAsync(h => h.Code == vmItem.Code))
+            {
+                ModelState.AddModelError(nameof(Door.Code), "Mã đã tồn tại.");
+                return View(vmItem);
+            }
+            // Create save db item
+            var dbItem = new Door
+            {
+                Id = Guid.NewGuid().ToString(),
+
+                CreatedBy = _loginUserId,
+                CreatedDate = DateTime.Now,
+                ModifiedBy = null,
+                ModifiedDate = null,
+                Status = (int)AtRowStatus.Normal,
+                RowStatus = null,
+
+                Code = vmItem.Code,
+                Name = vmItem.Name,
+                Description = vmItem.Description,
+                
+            };
+            _context.Add(dbItem);
+            // Set time stamp for table to handle concurrency conflict
+            //tableVersion.Action = 0;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = dbItem.Id });
         }
 
         // GET: Doors/Edit/5
@@ -156,13 +185,17 @@ namespace AtDoor.Controllers
                 ModelState.AddModelError("RowVersion", "Phiên bản hàng không hợp lệ, vui lòng thử lại.");
                 return View(dbItem);
             }
+            // Update db item               
             if (dbItem.Status != (int)AtRowStatus.Deleted)
             {
                 dbItem.Status = (int)AtRowStatus.Deleted;
                 dbItem.ModifiedBy = _loginUserId;
                 dbItem.ModifiedDate = DateTime.Now;
                 dbItem.RowStatus = rowStatus;
-                _context.Door.Remove(dbItem);
+
+                //_context.Entry(dbItem).Property(nameof(Door.RowStatus)).OriginalValue = rowStatus;
+                // Set time stamp for table to handle concurrency conflict
+                //tableVersion.LastModify = DateTime.Now;
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
