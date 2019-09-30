@@ -54,10 +54,14 @@ namespace AtDoor.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Code,Name,Description,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowStatus,Status,FkUserId")] Card card)
+        public async Task<IActionResult> Create([Bind("Id,Code,Name,Description,FkUserId")] Card card)
         {
             if (ModelState.IsValid)
             {
+                card.RowStatus = null;
+                card.Status = 0;
+                card.CreatedBy = "user";
+                card.CreatedDate = DateTime.Now; 
                 _context.Add(card);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -86,7 +90,7 @@ namespace AtDoor.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Code,Name,Description,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowStatus,Status,FkUserId")] Card card)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Code,Name,Description,ModifiedBy,ModifiedDate,RowStatus,Status,FkUserId")] Card card)
         {
             if (id != card.Id)
             {
