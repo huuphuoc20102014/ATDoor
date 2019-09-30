@@ -47,6 +47,7 @@ namespace AT_Door.Controllers
         // GET: Cards/Create
         public IActionResult Create()
         {
+
             return View();
         }
 
@@ -55,21 +56,46 @@ namespace AT_Door.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Code,Name,Description,FkUserId")] Card card)
+        public async Task<IActionResult> Create(CardCreateViewModel vmItem)
         {
-            if (ModelState.IsValid)
+            // Invalid model
+            if (!ModelState.IsValid)
             {
-                card.RowStatus = null;
-                card.Status = 0;
-                card.CreatedBy = "user";
-                card.CreatedDate = DateTime.Now;
-                _context.Add(card);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(vmItem);
             }
-            return View(card);
-        }
+            // Get time stamp for table to handle concurrency conflict
+            var tableName = nameof(Card);
+            var tableVersion = await _context.HistoryCard.FirstOrDefaultAsync(h => h.Id == tableName);
+            // Check code is existed
+            if (await _context.Card.AnyAsync(h => h.Code == vmItem.Code))
+            {
+                ModelState.AddModelError(nameof(Card.Code), "Mã đã tồn tại.");
+                return View(vmItem);
+            }
+            // Create save db item
+            var dbItem = new Card
+            {
+                Id = Guid.NewGuid().ToString(),
 
+                CreatedBy = _loginUserId,
+                CreatedDate = DateTime.Now,
+                ModifiedBy = null,
+                ModifiedDate = null,
+                Status = (int)AtRowStatus.Normal,
+                RowStatus = null,
+
+                Code = vmItem.Code,
+                Name = vmItem.Name,
+                Description = vmItem.Description,
+
+            };
+            _context.Add(dbItem);
+            // Set time stamp for table to handle concurrency conflict
+            //tableVersion.Action = 0;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = dbItem.Id });
+        }
+      
         // GET: Cards/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
