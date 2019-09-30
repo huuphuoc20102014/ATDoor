@@ -279,5 +279,7 @@ namespace AtDoor.Efs.Context
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        public DbSet<AtDoor.Efs.Entities.Users> User { get; set; }
     }
 }

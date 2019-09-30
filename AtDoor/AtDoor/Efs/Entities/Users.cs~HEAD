@@ -3,8 +3,14 @@ using System.Collections.Generic;
 
 namespace AtDoor.Efs.Entities
 {
-    public partial class User
+    public partial class Users
     {
+        public Users()
+        {
+            Card = new HashSet<Card>();
+            HistoryCard = new HashSet<HistoryCard>();
+        }
+
         public string Id { get; set; }
         public string Name { get; set; }
         public string FkCardId { get; set; }
@@ -16,5 +22,9 @@ namespace AtDoor.Efs.Entities
         public DateTime? ModifiedDate { get; set; }
         public byte[] RowStatus { get; set; }
         public int Status { get; set; }
+
+        public virtual Card FkCard { get; set; }
+        public virtual ICollection<Card> Card { get; set; }
+        public virtual ICollection<HistoryCard> HistoryCard { get; set; }
     }
 }
