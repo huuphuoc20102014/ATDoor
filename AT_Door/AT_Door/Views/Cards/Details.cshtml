@@ -1,0 +1,123 @@
+﻿@model AT_Door.Efs.Entities.Card
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+
+<h4>Chi tiết thẻ</h4>
+<hr />
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right ">
+    </div>
+    <div class="col-md-7">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+        <a asp-action="Index" class="k-button">Back to List</a>
+    </div>
+</div>
+
+
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        Mã :
+    </div>
+    <div class="col-md-7">
+        @Html.DisplayFor(model => model.Code)
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        Tên :
+    </div>
+    <div class="col-md-7">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        Chi tiết :
+    </div>
+    <div class="col-md-7">
+        @Html.DisplayFor(model => model.Description)
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        Người tạo :
+    </div>
+    <div class="col-md-7">
+        @Html.DisplayFor(model => model.CreatedBy)
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        Ngày tạo :
+    </div>
+    <div class="col-md-7">
+        @Html.DisplayFor(model => model.CreatedDate)
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        Người sửa :
+    </div>
+    <div class="col-md-7">
+        @Html.DisplayFor(model => model.ModifiedBy)
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        Ngày sửa :
+    </div>
+    <div class="col-md-7">
+        @Html.DisplayFor(model => model.ModifiedDate)
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        @Html.DisplayNameFor(model => model.RowStatus) :
+    </div>
+    <div class="col-md-7">
+        @Html.DisplayFor(model => model.RowStatus)
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        Trạng thái :
+    </div>
+    <div class="col-md-7">
+        @Model.Status.ToString("N0")
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-md-3 text-md-right details-label">
+        Người dùng :
+    </div>
+    <div class="col-md-7">
+        @Html.DisplayFor(model => model.FkUser.Name)
+    </div>
+</div>
+
+
+
+
+<div class="row form-group">
+    <div class="col-md-3 text-md-right ">
+    </div>
+    <div class="col-md-7">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+        <a asp-action="Index" class="k-button">Back to List</a>
+    </div>
+</div>
