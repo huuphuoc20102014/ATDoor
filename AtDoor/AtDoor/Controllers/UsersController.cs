@@ -22,8 +22,7 @@ namespace AtDoor.Controllers
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            var atDoorContext = _context.Users.Include(u => u.FkCard);
-            return View(await atDoorContext.ToListAsync());
+            return View(await _context.Users.Include(u => u.FkCard).Where(p => p.Status == (int)AtRowStatus.Normal).ToListAsync());
         }
 
         // GET: Users/Details/5
@@ -57,16 +56,43 @@ namespace AtDoor.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,FkCardId,Permission,Description,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowStatus,Status")] Users users)
+        public async Task<IActionResult> Create(UsersCreateViewModel vmItem)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(users);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(vmItem);
             }
-            ViewData["FkCardId"] = new SelectList(_context.Card, "Id", "Id", users.FkCardId);
-            return View(users);
+            // Get time stamp for table to handle concurrency conflict
+            var tableName = nameof(Users);
+            var tableVersion = await _context.HistoryCard.FirstOrDefaultAsync(h => h.Id == tableName);
+            // Check code is existed
+            if (await _context.Users.AnyAsync(h => h.Name == vmItem.Name))
+            {
+                ModelState.AddModelError(nameof(Users.Name), "Mã đã tồn tại.");
+                return View(vmItem);
+            }
+            // Create save db item
+            var dbItem = new Users
+            {
+                Id = Guid.NewGuid().ToString(),
+
+                CreatedBy = _loginUserId,
+                CreatedDate = DateTime.Now,
+                ModifiedBy = null,
+                ModifiedDate = null,
+                Status = (int)AtRowStatus.Normal,
+                RowStatus = null,
+
+                //Code = vmItem.Code,
+                Name = vmItem.Name,
+                Description = vmItem.Description,
+
+            };
+            _context.Add(dbItem);
+            // Set time stamp for table to handle concurrency conflict
+            //tableVersion.Action = 0;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = dbItem.Id });
         }
 
         // GET: Users/Edit/5
