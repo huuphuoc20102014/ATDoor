@@ -1,0 +1,90 @@
+﻿@model IEnumerable<AT_Door.Efs.Entities.Users>
+
+@{
+    ViewData["Title"] = "Cửa";
+}
+
+<h1>Người dùng</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New</a>
+</p>
+<div style="overflow-x: scroll;" height="540">
+    <div class="row align-self-start">
+        <div class="col-md-6 ">
+            <div class="row align-self-start">
+                <div class="col-md-5">
+                </div>
+                <div class="col-md-2 ">
+                    Mã
+                </div>
+                <div class="col-md-2 ">
+                    Tên
+                </div>
+                <div class="col-md-3">
+                    Mô tả
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-6 ">
+            <div class="row align-self-start">
+                <div class="col-md-3">
+                    người tạo
+                </div>
+                <div class="col-md-3">
+                    Ngày tạo
+                </div>
+                <div class="col-md-3">
+                    Người sửa
+                </div>
+                <div class="col-md-3">
+                    Ngày sửa
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <br />
+    @foreach (var item in Model)
+    {
+        <div class="row">
+            <div class="col-md-6 ">
+                <div class="row ">
+                    <div class="col-md-5">
+                        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a class="btn btn-success" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </div>
+                    <div class="col-md-2">
+                        @Html.DisplayFor(modelItem => item.Code)
+                    </div>
+                    <div class="col-md-2">
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-6 ">
+                <div class="row align-self-start">
+                    <div class="col-md-3">
+                        @Html.DisplayFor(modelItem => item.CreatedBy)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.DisplayFor(modelItem => item.CreatedDate)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.DisplayFor(modelItem => item.ModifiedBy)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.DisplayFor(modelItem => item.ModifiedDate)
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+</div>

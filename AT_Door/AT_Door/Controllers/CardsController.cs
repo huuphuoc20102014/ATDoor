@@ -11,7 +11,7 @@ using AtDoor.Controllers;
 
 namespace AT_Door.Controllers
 {
-    public class CardsController : Controller
+    public class CardsController : AtBaseController
     {
         private readonly AtDoorContext _context;
 
@@ -23,7 +23,7 @@ namespace AT_Door.Controllers
         // GET: Cards
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Card.ToListAsync());
+            return View(await _context.Card.Where(p => p.Status == (int)AtRowStatus.Normal).ToListAsync());
         }
 
         // GET: Cards/Details/5
