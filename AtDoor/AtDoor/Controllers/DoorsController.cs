@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AtDoor.Efs.Context;
 using AtDoor.Efs.Entities;
-using AtECommerce.Controllers;
 
 namespace AtDoor.Controllers
 {
@@ -147,7 +146,7 @@ namespace AtDoor.Controllers
         // POST: Doors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id, byte[] rowStatus)
+        public async Task<IActionResult> Delete(string id, byte[] rowStatus)
         {
             var dbItem = await _context.Door.FindAsync(id);
             var tableName = nameof(Door);
