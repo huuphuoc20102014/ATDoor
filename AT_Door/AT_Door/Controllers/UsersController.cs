@@ -55,15 +55,44 @@ namespace AT_Door.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Code,Permission,Description,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowStatus,Status")] Users users)
+        public async Task<IActionResult> Create(UserCreateViewModel vmItem)
         {
-            if (ModelState.IsValid)
+            // Invalid model
+            if (!ModelState.IsValid)
             {
-                _context.Add(users);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(vmItem);
             }
-            return View(users);
+            // Get time stamp for table to handle concurrency conflict
+            var tableName = nameof(Door);
+            var tableVersion = await _context.HistoryDoor.FirstOrDefaultAsync(h => h.Id == tableName);
+            // Check code is existed
+            if (await _context.Door.AnyAsync(h => h.Code == vmItem.Code))
+            {
+                ModelState.AddModelError(nameof(Door.Code), "Mã đã tồn tại.");
+                return View(vmItem);
+            }
+            // Create save db item
+            var dbItem = new Door
+            {
+                Id = Guid.NewGuid().ToString(),
+
+                CreatedBy = _loginUserId,
+                CreatedDate = DateTime.Now,
+                ModifiedBy = null,
+                ModifiedDate = null,
+                Status = (int)AtRowStatus.Normal,
+                RowStatus = null,
+
+                Code = vmItem.Code,
+                Name = vmItem.Name,
+                Description = vmItem.Description,
+
+            };
+            _context.Add(dbItem);
+            // Set time stamp for table to handle concurrency conflict
+            //tableVersion.Action = 0;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = dbItem.Id });
         }
 
         // GET: Users/Edit/5
@@ -74,12 +103,24 @@ namespace AT_Door.Controllers
                 return NotFound();
             }
 
-            var users = await _context.Users.FindAsync(id);
-            if (users == null)
+            var dbItem = await _context.Users.AsNoTracking()
+
+                .Where(h => h.Id == id)
+                .Select(h => new UserEditViewModel
+                {
+                    Id = h.Id,
+                    Code = h.Code,
+                    Name = h.Name,
+                    Description = h.Description,
+                    RowStatus = h.RowStatus,
+                })
+                .FirstOrDefaultAsync();
+            if (dbItem == null)
             {
                 return NotFound();
             }
-            return View(users);
+
+            return View(dbItem);
         }
 
         // POST: Users/Edit/5
@@ -87,37 +128,30 @@ namespace AT_Door.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Code,Permission,Description,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowStatus,Status")] Users users)
+        public async Task<IActionResult> Edit(UserEditViewModel vmItem)
         {
-            if (id != users.Id)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return View(vmItem);
             }
+            var tableName = nameof(Users);
+            var tableVersion = await _context.HistoryDoor.FirstOrDefaultAsync(h => h.Id == tableName);
+            var dbItem = await _context.Door
+                .Where(h => h.Id == vmItem.Id)
+                .FirstOrDefaultAsync();
+            // Update db item               
+            dbItem.ModifiedBy = _loginUserId;
+            dbItem.ModifiedDate = DateTime.Now;
+            dbItem.RowStatus = vmItem.RowStatus;
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(users);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UsersExists(users.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(users);
+            dbItem.Code = vmItem.Code;
+            dbItem.Name = vmItem.Name;
+            _context.Entry(dbItem).Property(nameof(Door.RowStatus)).OriginalValue = vmItem.RowStatus;
+            // Set time stamp for table to handle concurrency conflict
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = dbItem.Id });
         }
 
-        // GET: Users/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -125,30 +159,79 @@ namespace AT_Door.Controllers
                 return NotFound();
             }
 
-            var users = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (users == null)
+            var dbItem = await _context.Users.AsNoTracking()
+                .Where(h => h.Id == id)
+                .FirstOrDefaultAsync();
+            if (dbItem == null)
             {
                 return NotFound();
             }
 
-            return View(users);
+            return View(dbItem);
         }
 
         // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> Delete(string id, byte[] rowStatus)
         {
-            var users = await _context.Users.FindAsync(id);
-            _context.Users.Remove(users);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            var dbItem = await _context.Users.FindAsync(id);
+            if (rowStatus == null)
+            {
+                ModelState.AddModelError("RowVersion", "Phiên bản hàng không hợp lệ, vui lòng thử lại.");
+                return View(dbItem);
+            }
+            // Update db item               
+            if (dbItem.Status != (int)AtRowStatus.Deleted)
+            {
+                dbItem.Status = (int)AtRowStatus.Deleted;
+                dbItem.ModifiedBy = _loginUserId;
+                dbItem.ModifiedDate = DateTime.Now;
+                dbItem.RowStatus = rowStatus;
+
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index)); ;
         }
 
         private bool UsersExists(string id)
         {
             return _context.Users.Any(e => e.Id == id);
         }
+    }
+    public class UserBaseViewModel
+    {
+
+        public String Code { get; set; }
+        public String Name { get; set; }
+        public String Description { get; set; }
+
+
+    }
+
+    public class UserDetailsViewModel : UserBaseViewModel
+    {
+
+        public String Id { get; set; }
+        public String CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public byte[] RowStatus { get; set; }
+        public AtRowStatus Status { get; set; }
+
+
+    }
+
+    public class UserCreateViewModel : UserBaseViewModel
+    {
+
+    }
+
+    public class UserEditViewModel : UserBaseViewModel
+    {
+
+        public String Id { get; set; }
+        public byte[] RowStatus { get; set; }
     }
 }
