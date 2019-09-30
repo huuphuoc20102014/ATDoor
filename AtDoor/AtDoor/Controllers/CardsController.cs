@@ -10,7 +10,7 @@ using AtDoor.Efs.Entities;
 
 namespace AtDoor.Controllers
 {
-    public class CardsController : Controller
+    public class CardsController : AtBaseController
     {
         private readonly AtDoorContext _context;
 
@@ -77,12 +77,25 @@ namespace AtDoor.Controllers
                 return NotFound();
             }
 
-            var card = await _context.Card.FindAsync(id);
-            if (card == null)
+            var dbItem = await _context.Card.AsNoTracking()
+
+                .Where(h => h.Id == id)
+
+                .Select(h => new CardEditViewModel
+                {
+                    Id = h.Id,
+                    Code = h.Code,
+                    Name = h.Name,
+                    Description = h.Description,
+                    FkUserId = h.FkUserId,
+                    RowStatus = h.RowStatus,
+                })
+                .FirstOrDefaultAsync();
+            if (dbItem == null)
             {
                 return NotFound();
             }
-            return View(card);
+            return View(dbItem);
         }
 
         // POST: Cards/Edit/5
@@ -90,34 +103,29 @@ namespace AtDoor.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Code,Name,Description,ModifiedBy,ModifiedDate,RowStatus,Status,FkUserId")] Card card)
+        public async Task<IActionResult> Edit(CardEditViewModel vmItem)
         {
-            if (id != card.Id)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return View(vmItem);
             }
+            var tableName = nameof(Card);
+            var tableVersion = await _context.HistoryCard.FirstOrDefaultAsync(h => h.Id == tableName);
+            var dbItem = await _context.Card
+                .Where(h => h.Id == vmItem.Id)
+                .FirstOrDefaultAsync();
+            // Update db item               
+            dbItem.ModifiedBy = "user";
+            dbItem.ModifiedDate = DateTime.Now;
+            dbItem.RowStatus = vmItem.RowStatus;
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(card);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CardExists(card.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(card);
+            dbItem.Code = vmItem.Code;
+            dbItem.Name = vmItem.Name;
+            dbItem.FkUserId = vmItem.FkUserId;
+            _context.Entry(dbItem).Property(nameof(Card.RowStatus)).OriginalValue = vmItem.RowStatus;
+            // Set time stamp for table to handle concurrency conflict
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = dbItem.Id });
         }
 
         // GET: Cards/Delete/5
@@ -153,5 +161,39 @@ namespace AtDoor.Controllers
         {
             return _context.Card.Any(e => e.Id == id);
         }
+    }
+    public class CardBaseViewModel
+    {
+
+        public String Code { get; set; }
+        public String Name { get; set; }
+        public String Description { get; set; }
+        public String FkUserId { get; set; }
+
+
+    }
+
+    public class CardDetailsViewModel : CardBaseViewModel
+    {
+
+        public String Id { get; set; }
+        public String CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public byte[] RowStatus { get; set; }
+        public AtRowStatus Status { get; set; }
+
+    }
+
+    public class CardCreateViewModel : CardBaseViewModel
+    {
+
+    }
+
+    public class CardEditViewModel : CardBaseViewModel
+    {
+        public String Id { get; set; }
+        public byte[] RowStatus { get; set; }
     }
 }

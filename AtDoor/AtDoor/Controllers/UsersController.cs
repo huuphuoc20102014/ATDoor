@@ -10,7 +10,7 @@ using AtDoor.Efs.Entities;
 
 namespace AtDoor.Controllers
 {
-    public class UsersController : Controller
+    public class UsersController : AtBaseController
     {
         private readonly AtDoorContext _context;
 
@@ -77,13 +77,25 @@ namespace AtDoor.Controllers
                 return NotFound();
             }
 
-            var users = await _context.Users.FindAsync(id);
-            if (users == null)
+            var dbItem = await _context.Users.AsNoTracking()
+
+                .Where(h => h.Id == id)
+
+                .Select(h => new UsersEditViewModel
+                {
+                    Id = h.Id,
+                    Name = h.Name,
+                    FkCardId = h.FkCardId,
+                    Permission = h.Permission,
+                    Description = h.Description,
+                    RowStatus = h.RowStatus,
+                })
+                .FirstOrDefaultAsync();
+            if (dbItem == null)
             {
                 return NotFound();
             }
-            ViewData["FkCardId"] = new SelectList(_context.Card, "Id", "Id", users.FkCardId);
-            return View(users);
+            return View(dbItem);
         }
 
         // POST: Users/Edit/5
@@ -91,35 +103,30 @@ namespace AtDoor.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,FkCardId,Permission,Description,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowStatus,Status")] Users users)
+        public async Task<IActionResult> Edit(UsersEditViewModel vmItem)
         {
-            if (id != users.Id)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return View(vmItem);
             }
+            var tableName = nameof(Users);
+            var tableVersion = await _context.HistoryCard.FirstOrDefaultAsync(h => h.Id == tableName);
+            var dbItem = await _context.Users
+                .Where(h => h.Id == vmItem.Id)
+                .FirstOrDefaultAsync();
+            // Update db item               
+            dbItem.ModifiedBy = "user";
+            dbItem.ModifiedDate = DateTime.Now;
+            dbItem.RowStatus = vmItem.RowStatus;
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(users);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UsersExists(users.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["FkCardId"] = new SelectList(_context.Card, "Id", "Id", users.FkCardId);
-            return View(users);
+            dbItem.Name = vmItem.Name;
+            dbItem.Permission = vmItem.Permission;
+            dbItem.Description = vmItem.Description;
+            dbItem.FkCardId = vmItem.FkCardId;
+            _context.Entry(dbItem).Property(nameof(Users.RowStatus)).OriginalValue = vmItem.RowStatus;
+            // Set time stamp for table to handle concurrency conflict
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = dbItem.Id });
         }
 
         // GET: Users/Delete/5
@@ -156,5 +163,37 @@ namespace AtDoor.Controllers
         {
             return _context.Users.Any(e => e.Id == id);
         }
+    }
+    public class UsersBaseViewModel
+    {
+        public String Name { get; set; }
+        public String FkCardId { get; set; }
+        public int? Permission { get; set; }
+        public String Description { get; set; }
+
+    }
+
+    public class UsersDetailsViewModel : UsersBaseViewModel
+    {
+
+        public String Id { get; set; }
+        public String CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public String ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public byte[] RowStatus { get; set; }
+        public AtRowStatus Status { get; set; }
+
+    }
+
+    public class UsersCreateViewModel : UsersBaseViewModel
+    {
+
+    }
+
+    public class UsersEditViewModel : UsersBaseViewModel
+    {
+        public String Id { get; set; }
+        public byte[] RowStatus { get; set; }
     }
 }

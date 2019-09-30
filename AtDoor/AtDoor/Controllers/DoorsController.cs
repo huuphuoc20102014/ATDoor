@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AtDoor.Efs.Context;
 using AtDoor.Efs.Entities;
-using AtECommerce.Controllers;
 
 namespace AtDoor.Controllers
 {
