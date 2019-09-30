@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AtDoor.Efs.Context;
 using AtDoor.Efs.Entities;
+using AtECommerce.Controllers;
 
 namespace AtDoor.Controllers
 {
@@ -73,12 +74,25 @@ namespace AtDoor.Controllers
                 return NotFound();
             }
 
-            var door = await _context.Door.FindAsync(id);
-            if (door == null)
+            var dbItem = await _context.Door.AsNoTracking()
+
+                .Where(h => h.Id == id)
+
+                .Select(h => new DoorEditViewModel
+                {
+                    Id = h.Id,
+                    Code = h.Code,
+                    Name = h.Name,
+                    Description = h.Description,
+                    RowStatus = h.RowStatus,
+                })
+                .FirstOrDefaultAsync();
+            if (dbItem == null)
             {
                 return NotFound();
             }
-            return View(door);
+
+            return View(dbItem);
         }
 
         // POST: Doors/Edit/5
@@ -86,34 +100,28 @@ namespace AtDoor.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Code,Name,Description,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,RowStatus,Status")] Door door)
+        public async Task<IActionResult> Edit(DoorEditViewModel vmItem)
         {
-            if (id != door.Id)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return View(vmItem);
             }
+            var tableName = nameof(Door);
+            var tableVersion = await _context.HistoryDoor.FirstOrDefaultAsync(h => h.Id == tableName);
+            var dbItem = await _context.Door
+                .Where(h => h.Id == vmItem.Id)
+                .FirstOrDefaultAsync();
+            // Update db item               
+            dbItem.ModifiedBy = "user";
+            dbItem.ModifiedDate = DateTime.Now;
+            dbItem.RowStatus = vmItem.RowStatus;
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(door);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DoorExists(door.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(door);
+            dbItem.Code = vmItem.Code;
+            dbItem.Name = vmItem.Name;
+            _context.Entry(dbItem).Property(nameof(Door.RowStatus)).OriginalValue = vmItem.RowStatus;
+            // Set time stamp for table to handle concurrency conflict
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = dbItem.Id });
         }
 
         // GET: Doors/Delete/5
@@ -149,5 +157,39 @@ namespace AtDoor.Controllers
         {
             return _context.Door.Any(e => e.Id == id);
         }
+    }
+    public class DoorBaseViewModel
+    {
+
+        public String Code { get; set; }
+        public String Name { get; set; }
+        public String Description { get; set; }
+
+
+    }
+
+    public class DoorDetailsViewModel : DoorBaseViewModel
+    {
+
+        public String Id { get; set; }
+        public String CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public byte[] RowStatus { get; set; }
+        public AtRowStatus status { get; set; }
+
+    }
+
+    public class DoorCreateViewModel : DoorBaseViewModel
+    {
+
+    }
+
+    public class DoorEditViewModel : DoorBaseViewModel
+    {
+
+        public String Id { get; set; }
+        public byte[] RowStatus { get; set; }
     }
 }
