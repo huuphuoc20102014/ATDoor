@@ -18,10 +18,10 @@
                 <div class="col-md-2 ">
                     Mã
                 </div>
-                <div class="col-md-3 ">
+                <div class="col-md-2 ">
                     Tên
                 </div>
-                <div class="col-md-2 ">
+                <div class="col-md-3 ">
                     Mô tả
                 </div>
 
@@ -41,15 +41,10 @@
                 <div class="col-md-2 ">
                     Ngày sửa
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-4">
                     Mã người dùng
                 </div>
-                <div class="col-md-2 ">
-                    @Html.DisplayNameFor(model => model.RowStatus)
-                </div>
-                <div class="col-md-1 ">
-                    @Html.DisplayNameFor(model => model.Status)
-                </div>
+              
             </div>
         </div>
     </div>
@@ -69,7 +64,7 @@
                     <div class="col-md-2">
                         @Html.DisplayFor(modelItem => item.Name)
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         @Html.DisplayFor(modelItem => item.Description)
                     </div>
 
@@ -89,16 +84,9 @@
                     <div class="col-md-2">
                         @Html.DisplayFor(modelItem => item.ModifiedDate)
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-4">
                         @Html.DisplayFor(modelItem => item.FkUserId)
                     </div>
-                    <div class="col-md-2">
-                        @Html.DisplayFor(modelItem => item.RowStatus)
-                    </div>
-                    <div class="col-md-1">
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </div>
-
 
                 </div>
             </div>
