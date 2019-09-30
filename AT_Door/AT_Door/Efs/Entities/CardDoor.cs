@@ -17,5 +17,10 @@ namespace AT_Door.Efs.Entities
         public DateTime? ModifiedDate { get; set; }
         public byte[] RowStatus { get; set; }
         public int Status { get; set; }
+
+        public virtual Card FkCard { get; set; }
+        public virtual Door FkDoor { get; set; }
+
+
     }
 }

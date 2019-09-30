@@ -1,0 +1,60 @@
+﻿@model IEnumerable<AT_Door.Efs.Entities.CardDoor>
+
+@{
+    ViewData["Title"] = "Thẻ";
+}
+
+<h1>Thẻ</h1>
+
+
+<div style="overflow: scroll; height:540px;">
+    <div class="row align-self-start">
+
+        <div class="col-md-2 ">
+            Mã
+        </div>
+        <div class="col-md-2 ">
+            Tên
+        </div>
+        <div class="col-md-2 ">
+            Mô tả
+        </div>
+        <div class="col-md-2">
+            ID cửa
+        </div>
+        <div class="col-md-2">
+            ID thẻ
+        </div>
+        <div class="col-md-2">
+            Ngày tạo
+        </div>
+    </div>
+
+    @foreach (var item in Model)
+    {
+<div class="row">
+
+    <div class="col-md-2">
+        @Html.DisplayFor(modelItem => item.Code)
+    </div>
+    <div class="col-md-2">
+        @Html.DisplayFor(modelItem => item.Name)
+    </div>
+    <div class="col-md-2">
+        @Html.DisplayFor(modelItem => item.Description)
+    </div>
+
+
+    <div class="col-md-2">
+        @Html.DisplayFor(modelItem => item.FkDoorId)
+    </div>
+    <div class="col-md-2">
+        @Html.DisplayFor(modelItem => item.FkCardId)
+    </div>
+    <div class="col-md-2">
+        @Html.DisplayFor(modelItem => item.CreatedDate)
+    </div>
+</div>
+
+    }
+</div>
