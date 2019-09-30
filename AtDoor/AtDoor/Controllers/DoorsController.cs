@@ -11,7 +11,7 @@ using AtECommerce.Controllers;
 
 namespace AtDoor.Controllers
 {
-    public class DoorsController : Controller
+    public class DoorsController : AtBaseController
     {
         private readonly AtDoorContext _context;
 
@@ -112,7 +112,7 @@ namespace AtDoor.Controllers
                 .Where(h => h.Id == vmItem.Id)
                 .FirstOrDefaultAsync();
             // Update db item               
-            dbItem.ModifiedBy = "user";
+            dbItem.ModifiedBy = _loginUserId;
             dbItem.ModifiedDate = DateTime.Now;
             dbItem.RowStatus = vmItem.RowStatus;
 
@@ -132,24 +132,40 @@ namespace AtDoor.Controllers
                 return NotFound();
             }
 
-            var door = await _context.Door
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (door == null)
+            var dbItem = await _context.Door.AsNoTracking()
+
+                .Where(h => h.Id == id)
+                .FirstOrDefaultAsync();
+            if (dbItem == null)
             {
                 return NotFound();
             }
 
-            return View(door);
+            return View(dbItem);
         }
 
         // POST: Doors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(string id, byte[] rowStatus)
         {
-            var door = await _context.Door.FindAsync(id);
-            _context.Door.Remove(door);
-            await _context.SaveChangesAsync();
+            var dbItem = await _context.Door.FindAsync(id);
+            var tableName = nameof(Door);
+            var tableVersion = await _context.HistoryDoor.FirstOrDefaultAsync(h => h.Id == tableName);
+            if (rowStatus == null)
+            {
+                ModelState.AddModelError("RowVersion", "Phiên bản hàng không hợp lệ, vui lòng thử lại.");
+                return View(dbItem);
+            }
+            if (dbItem.Status != (int)AtRowStatus.Deleted)
+            {
+                dbItem.Status = (int)AtRowStatus.Deleted;
+                dbItem.ModifiedBy = _loginUserId;
+                dbItem.ModifiedDate = DateTime.Now;
+                dbItem.RowStatus = rowStatus;
+                _context.Door.Remove(dbItem);
+                await _context.SaveChangesAsync();
+            }
             return RedirectToAction(nameof(Index));
         }
 
