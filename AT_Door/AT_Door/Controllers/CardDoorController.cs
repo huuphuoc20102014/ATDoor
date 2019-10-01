@@ -19,7 +19,7 @@ namespace AT_Door.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            return View(await _context.CardDoor.Where(p => p.Status == (int)AtRowStatus.Normal).ToListAsync());
+            return View(await _context.CardDoor.Include(p => p.FkCard).Include(p => p.FkDoor).Where(p => p.Status == (int)AtRowStatus.Normal).ToListAsync());
         }
     }
 }

@@ -20,10 +20,10 @@
             Mô tả
         </div>
         <div class="col-md-2">
-            ID cửa
+            Cửa
         </div>
         <div class="col-md-2">
-            ID thẻ
+            Thẻ
         </div>
         <div class="col-md-2">
             Ngày tạo
@@ -46,10 +46,10 @@
 
 
     <div class="col-md-2">
-        @Html.DisplayFor(modelItem => item.FkDoorId)
+        @Html.DisplayFor(modelItem => item.FkDoor.Name)
     </div>
     <div class="col-md-2">
-        @Html.DisplayFor(modelItem => item.FkCardId)
+        @Html.DisplayFor(modelItem => item.FkCard.Name)
     </div>
     <div class="col-md-2">
         @Html.DisplayFor(modelItem => item.CreatedDate)

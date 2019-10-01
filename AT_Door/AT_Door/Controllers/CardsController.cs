@@ -23,7 +23,7 @@ namespace AT_Door.Controllers
         // GET: Cards
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Card.Where(p => p.Status == (int)AtRowStatus.Normal).ToListAsync());
+            return View(await _context.Card.Include(m => m.FkUser).Where(p => p.Status == (int)AtRowStatus.Normal).ToListAsync());
         }
 
         // GET: Cards/Details/5
@@ -35,6 +35,7 @@ namespace AT_Door.Controllers
             }
 
             var card = await _context.Card
+                .Include(m => m.FkUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (card == null)
             {
@@ -164,6 +165,7 @@ namespace AT_Door.Controllers
             }
 
             var card = await _context.Card
+                .Include(m => m.FkUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (card == null)
             {
