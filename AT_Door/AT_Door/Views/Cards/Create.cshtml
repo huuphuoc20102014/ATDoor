@@ -57,18 +57,19 @@
         </div>
     </div>
 
-    @*<div class="row form-group">
+    <div class="row form-group">
             <div class="col-md-3 text-md-right ">
                 <label asp-for="FkUserId" class="col-form-label">Người dùng</label>
                 <span class="text-danger">*</span>
             </div>
             <div class="col-md-7">
-                <kendo-dropdownlist for="FkUserId" class="form-control" bind-to="@ViewBag.FkUserId" />
+                @Html.DropDownListFor(model => model.FkUserId, (SelectList)ViewBag.listUser, "--Chọn--", new { @class = "form-control" })
             </div>
             <div class="offset-md-3 col-md-7 at-wrapper-validate">
                 <span asp-validation-for="FkUserId" class="text-danger"></span>
             </div>
-        </div>*@
+    </div>
+
     <div class="row form-group">
         <div class="col-md-3 text-md-right ">
         </div>

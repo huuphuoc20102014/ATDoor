@@ -48,7 +48,8 @@ namespace AT_Door.Controllers
         // GET: Cards/Create
         public IActionResult Create()
         {
-
+            var user = _context.Users.ToList();
+            ViewBag.listUser = new SelectList(user, "Id", "Name");
             return View();
         }
 
@@ -85,6 +86,7 @@ namespace AT_Door.Controllers
                 Status = (int)AtRowStatus.Normal,
                 RowStatus = null,
 
+                FkUserId = vmItem.FkUserId,
                 Code = vmItem.Code,
                 Name = vmItem.Name,
                 Description = vmItem.Description,
@@ -105,6 +107,8 @@ namespace AT_Door.Controllers
                 return NotFound();
             }
 
+            var user = _context.Users.ToList();
+            ViewBag.listUser = new SelectList(user, "Id", "Name");
             var dbItem = await _context.Card.AsNoTracking()
 
                 .Where(h => h.Id == id)
@@ -147,6 +151,7 @@ namespace AT_Door.Controllers
             dbItem.ModifiedDate = DateTime.Now;
             dbItem.RowStatus = vmItem.RowStatus;
 
+            dbItem.FkUserId = vmItem.FkUserId;
             dbItem.Code = vmItem.Code;
             dbItem.Name = vmItem.Name;
             dbItem.FkUserId = vmItem.FkUserId;
