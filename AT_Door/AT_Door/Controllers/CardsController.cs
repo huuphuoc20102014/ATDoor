@@ -151,7 +151,6 @@ namespace AT_Door.Controllers
             dbItem.ModifiedDate = DateTime.Now;
             dbItem.RowStatus = vmItem.RowStatus;
 
-            dbItem.FkUserId = vmItem.FkUserId;
             dbItem.Code = vmItem.Code;
             dbItem.Name = vmItem.Name;
             dbItem.FkUserId = vmItem.FkUserId;
@@ -196,6 +195,7 @@ namespace AT_Door.Controllers
             return _context.Card.Any(e => e.Id == id);
         }
     }
+
     public class CardBaseViewModel
     {
 

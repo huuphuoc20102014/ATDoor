@@ -199,6 +199,7 @@ namespace AT_Door.Controllers
             return _context.Users.Any(e => e.Id == id);
         }
     }
+
     public class UserBaseViewModel
     {
 
