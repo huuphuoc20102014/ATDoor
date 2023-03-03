@@ -10,7 +10,7 @@
     <PackageReference Include="CsvHelper" Version="12.1.2" />
     <PackageReference Include="EntityFrameworkCore.Scaffolding.Handlebars" Version="2.1.1" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.5.0" />
-    <PackageReference Include="jQuery.Validation" Version="1.17.0" />
+    <PackageReference Include="jQuery.Validation" Version="1.19.3" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.0.0" />
